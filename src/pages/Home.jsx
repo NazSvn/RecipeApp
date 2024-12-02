@@ -1,7 +1,10 @@
+import RecipeList from '../components/RecipeList';
+
 const Home = () => {
   return (
     <>
-      <div>Home</div>
+      <div className='pt-24'></div>
+      <RecipeList />
     </>
   );
 };
