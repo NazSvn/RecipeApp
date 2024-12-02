@@ -1,8 +1,13 @@
+import { useState } from 'react';
 import { GlobalContext } from './GlobalContext';
 import PropTypes from 'prop-types';
 
 const RecipeContextProvider = ({ children }) => {
-  const value = {};
+  const [recipeList, setRecipeList] = useState(null);
+  const value = {
+    recipeList,
+    setRecipeList,
+  };
 
   return (
     <GlobalContext.Provider value={value}>{children}</GlobalContext.Provider>
