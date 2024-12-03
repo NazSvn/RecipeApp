@@ -16,10 +16,7 @@ const RecipeItem = ({ recipe }) => {
             <div className='text-base '>{recipe.title}</div>
             <div className=' font-bold text-lg'>{recipe.title}</div>
           </div>
-        </Link>
-        <button className=' h-10 w-10 rounded-full absolute right-2 top-2  bg-orange-500'>
-          fav
-        </button>
+        </Link> 
       </div>
     </>
   );
