@@ -1,24 +1,26 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-
-import { GlobalContext } from '../context/GlobalContext'; 
+import { GlobalContext } from '../context/GlobalContext';
 import useFetch from '../hooks/useFetch';
+import { useNavigate } from 'react-router-dom';
 
 const CACHE_AGE_LIMIT = 60 * 60 * 1000;
 
 const SearchEngine = () => {
+  const navigate = useNavigate();
+
   const [query, setQuery] = useState('');
   const [inputValue, setInputValue] = useState('');
-  const [cachedData, setCachedData] = useState({});
+  const [cachedData, setCachedData] = useState(() => {
+    const savedCache = localStorage.getItem('cachedRecipeList');
+    return savedCache ? JSON.parse(savedCache) : {};
+  });
+  const [url, setUrl] = useState(null);
 
   const { setRecipeList } = useContext(GlobalContext);
 
   const inputRef = useRef();
 
-  const { fetchedData, loading, error } = useFetch(
-    query
-      ? `https://api.spoonacular.com/recipes/complexSearch?apiKey=&query=${query}&number=20`
-      : null
-  );
+  const { fetchedData, loading, error } = useFetch(url);
 
   const handleOnChange = (e) => {
     setInputValue(e.target.value);
@@ -28,8 +30,10 @@ const SearchEngine = () => {
     switch (e.key) {
       case 'Enter':
         checkCache(inputValue);
+        setQuery(inputValue);
         setInputValue('');
         inputRef.current.blur();
+        navigate('/');
         break;
       case 'Escape':
         setInputValue('');
@@ -42,10 +46,10 @@ const SearchEngine = () => {
   };
 
   const checkCache = useCallback(
-    (recipe) => {
-      if (!recipe) return null;
+    (query) => {
+      if (!query) return null;
 
-      const cacheKey = recipe.toLocaleLowerCase().trim();
+      const cacheKey = query.toLocaleLowerCase().trim();
       const cachedResult = cachedData[cacheKey];
 
       if (cachedResult) {
@@ -53,30 +57,38 @@ const SearchEngine = () => {
 
         if (cacheAge < CACHE_AGE_LIMIT) {
           setRecipeList(cachedResult.data);
-          return true;
+          setUrl(null);
+          console.log('get from cache');
         }
+      } else {
+        setUrl(
+          `https://api.spoonacular.com/recipes/complexSearch?apiKey=&query=${query}&number=20`
+        );
+        console.log('call api');
       }
-
-      setQuery(recipe); // Trigger a new fetch if not in cache
-      return false;
     },
     [cachedData, setRecipeList]
   );
 
   useEffect(() => {
-    if (!fetchedData) return;
+    if (fetchedData) {
+      const cacheKey = query.toLocaleLowerCase().trim();
 
-    const cacheKey = query.toLocaleLowerCase().trim();
+      const updateCache = {
+        ...cachedData,
+        [cacheKey]: {
+          data: fetchedData,
+          timestamp: Date.now(),
+        },
+      };
+      setCachedData(updateCache);
 
-    setCachedData((prev) => ({
-      ...prev,
-      [cacheKey]: {
-        data: fetchedData,
-        timestamp: Date.now(),
-      },
-    }));
-    setRecipeList(fetchedData);
-  }, [fetchedData, query, setRecipeList]);
+      localStorage.setItem('cachedRecipeList', JSON.stringify(updateCache));
+
+      setRecipeList(fetchedData);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchedData]);
 
   if (loading)
     return (
@@ -103,7 +115,7 @@ const SearchEngine = () => {
         onChange={handleOnChange}
         onKeyDown={(e) => handleKeys(e)}
         aria-label='Search for recipes'
-        className='p-2 rounded-md w-96 shadow-sm '
+        className='p-2 rounded-md w-96 shadow-sm'
       />
     </>
   );
