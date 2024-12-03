@@ -1,16 +1,43 @@
 import {
-  IoHeartCircleOutline,
+  IoHeartDislike,
+  IoHeartOutline,
   IoPieChart,
   IoTimeOutline,
 } from 'react-icons/io5';
-
+import { useContext } from 'react';
 import PropTypes from 'prop-types';
+import { GlobalContext } from '../context/GlobalContext';
 
 const RecipeDetails = ({ detailsData }) => {
+  const { favorites, setFavorites } = useContext(GlobalContext);
+
   const description = detailsData?.summary;
   const descPart = description?.split('.');
   const shortenedDescription = descPart?.slice(0, 2).join('.') + '.';
+ 
+  const isFavorite = favorites.some(fav => fav.id === detailsData?.id)
 
+  const handleClick = () => { 
+    const isFavoriteRecipe = favorites.some((fav) => fav.id === detailsData.id);
+
+    if (isFavoriteRecipe) { 
+      const updatedFavorites = favorites.filter(
+        (fav) => fav.id !== detailsData.id
+      );
+      setFavorites(updatedFavorites);
+      localStorage.setItem('favoriteList', JSON.stringify(updatedFavorites));
+    } else { 
+      const updatedFavorites = [
+        ...favorites,
+        {
+          ...detailsData,
+          isFavorite: true,
+        },
+      ];
+      setFavorites(updatedFavorites);
+      localStorage.setItem('favoriteList', JSON.stringify(updatedFavorites));
+    }
+  }; 
   return (
     <>
       <section className='bg-slate-400 sm:h-[500px] p-10'>
@@ -65,11 +92,80 @@ const RecipeDetails = ({ detailsData }) => {
                   </div>
                 ))}
               </div>
-              <button className='w-52 h-10 mt-16 gap-2 border rounded-md flex items-center justify-center border-slate-900'>
-                <IoHeartCircleOutline size={28} /> <span>Add to favorites</span>
+              <button
+                className='w-52 h-10 mt-16 gap-2 border rounded-md flex items-center justify-center border-slate-900'
+                onClick={handleClick}
+              >
+                {isFavorite ? (
+                  <IoHeartDislike size={28} />
+                ) : (
+                  <IoHeartOutline size={28} />
+                )}{' '}
+                <span>
+                  {isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                </span>
               </button>
             </div>
             <div>{detailsData?.creditsText}</div>
+          </div>
+        )}
+      </section>
+
+      <section>
+        {detailsData && (
+          <div className='container mx-auto px-4 py-8 max-w-4xl'>
+            <div className='shadow-lg rounded-lg overflow-hidden'>
+              <div className=''>
+                <h2 className='text-2xl font-semibold mb-4 border-b pb-2'>
+                  Ingredients
+                </h2>
+                <ul className='space-y-2 text-sm sm:text-base '>
+                  {detailsData?.extendedIngredients?.map((item, index) => (
+                    <li
+                      key={index}
+                      className='flex items-center  pb-3 flex-wrap border-b ml-4'
+                    >
+                      <span className='font-medium mr-2'>
+                        <span>{item.amount}</span> <span>{item.unit}</span>
+                      </span>
+                      <span className=''>{item.originalName}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Instructions Section */}
+              <div className='pt-6'>
+                <h2 className='text-2xl font-semibold mb-4 border-b pb-2'>
+                  Directions
+                </h2>
+                {detailsData?.analyzedInstructions?.map((instruction, i) => (
+                  <div
+                    key={i}
+                    className='mb-4'
+                  >
+                    {instruction.name && (
+                      <h3 className='text-xl font-medium mb-2'>
+                        {instruction.name}
+                      </h3>
+                    )}
+                    <ul className='space-y-2  '>
+                      {instruction.steps.map((step) => (
+                        <li
+                          key={step.number}
+                          className='ml-4'
+                        >
+                          <span className='font-semibold mr-2'>
+                            Step {step.number}
+                          </span>
+                          {step.step}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </section>
@@ -80,5 +176,5 @@ const RecipeDetails = ({ detailsData }) => {
 export default RecipeDetails;
 
 RecipeDetails.propTypes = {
-  detailsData: PropTypes.object.isRequired,
+  detailsData: PropTypes.object,
 };
