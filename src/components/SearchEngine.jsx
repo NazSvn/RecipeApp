@@ -2,8 +2,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { GlobalContext } from '../context/GlobalContext';
 import useFetch from '../hooks/useFetch';
 import { useNavigate } from 'react-router-dom';
-
-const CACHE_AGE_LIMIT = 60 * 60 * 1000;
+import useCleanupCache from '../hooks/useCleanupCache';
 
 const SearchEngine = () => {
   const navigate = useNavigate();
@@ -16,11 +15,13 @@ const SearchEngine = () => {
   });
   const [url, setUrl] = useState(null);
 
-  const { setRecipeList } = useContext(GlobalContext);
+  const { setRecipeList} = useContext(GlobalContext);
 
   const inputRef = useRef();
 
   const { fetchedData, loading, error } = useFetch(url);
+
+  const cleanupCache = useCleanupCache();
 
   const handleOnChange = (e) => {
     setInputValue(e.target.value);
@@ -49,16 +50,24 @@ const SearchEngine = () => {
     (query) => {
       if (!query) return null;
 
+      const cleanedCache = cleanupCache(cachedData);
+
       const cacheKey = query.toLocaleLowerCase().trim();
-      const cachedResult = cachedData[cacheKey];
+      const cachedResult = cleanedCache[cacheKey];
 
       if (cachedResult) {
-        const cacheAge = Date.now() - cachedResult.timestamp;
+        setRecipeList(cachedResult.data);
+        setUrl(null);
+        console.log('get from cache');
 
-        if (cacheAge < CACHE_AGE_LIMIT) {
-          setRecipeList(cachedResult.data);
-          setUrl(null);
-          console.log('get from cache');
+        if (
+          Object.keys(cleanedCache).length !== Object.keys(cachedData).length
+        ) {
+          setCachedData(cleanedCache);
+          localStorage.setItem(
+            'cachedRecipeList',
+            JSON.stringify(cleanedCache)
+          );
         }
       } else {
         setUrl(
@@ -67,7 +76,7 @@ const SearchEngine = () => {
         console.log('call api');
       }
     },
-    [cachedData, setRecipeList]
+    [cachedData, cleanupCache, setRecipeList]
   );
 
   useEffect(() => {
