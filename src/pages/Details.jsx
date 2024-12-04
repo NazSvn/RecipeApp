@@ -2,8 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
 import RecipeDetails from '../components/RecipeDetails';
 import useFetch from '../hooks/useFetch';
-
-const CACHE_AGE_LIMIT = 60 * 60 * 1000;
+import useCleanupCache from '../hooks/useCleanupCache';
 
 const Details = () => {
   const params = useParams();
@@ -17,22 +16,23 @@ const Details = () => {
 
   const { fetchedData, loading, error } = useFetch(url);
 
+  const cleanupCache = useCleanupCache();
+
   const checkCache = useCallback(() => {
     const recipeId = params.id;
-    const cachedRecipe = cachedDetails[recipeId];
+
+    const cleanedCache = cleanupCache(cachedDetails);
+    const cachedRecipe = cleanedCache[recipeId];
 
     if (cachedRecipe) {
-      const cacheAge = Date.now() - cachedRecipe.timestamp;
-      if (cacheAge < CACHE_AGE_LIMIT) {
-        setDetailsData(cachedRecipe.data);
-        setUrl(null); 
-      }
+      setDetailsData(cachedRecipe.data);
+      setUrl(null);
     } else {
       setUrl(
         `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=`
-      ); 
+      );
     }
-  }, [cachedDetails, params.id]);
+  }, [cachedDetails, cleanupCache, params.id]);
 
   useEffect(() => {
     checkCache();
@@ -72,7 +72,7 @@ const Details = () => {
   return (
     <>
       <div className='pt-24'></div>
-      <RecipeDetails detailsData={detailsData} />      
+      <RecipeDetails detailsData={detailsData} />
     </>
   );
 };
