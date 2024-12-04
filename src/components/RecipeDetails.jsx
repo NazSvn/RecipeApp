@@ -9,35 +9,14 @@ import PropTypes from 'prop-types';
 import { GlobalContext } from '../context/GlobalContext';
 
 const RecipeDetails = ({ detailsData }) => {
-  const { favorites, setFavorites } = useContext(GlobalContext);
+  const { favorites, toggleFav } = useContext(GlobalContext);
 
   const description = detailsData?.summary;
   const descPart = description?.split('.');
   const shortenedDescription = descPart?.slice(0, 2).join('.') + '.';
- 
-  const isFavorite = favorites.some(fav => fav.id === detailsData?.id)
 
-  const handleClick = () => { 
-    const isFavoriteRecipe = favorites.some((fav) => fav.id === detailsData.id);
+  const isFavorite = favorites.some((fav) => fav.id === detailsData?.id);
 
-    if (isFavoriteRecipe) { 
-      const updatedFavorites = favorites.filter(
-        (fav) => fav.id !== detailsData.id
-      );
-      setFavorites(updatedFavorites);
-      localStorage.setItem('favoriteList', JSON.stringify(updatedFavorites));
-    } else { 
-      const updatedFavorites = [
-        ...favorites,
-        {
-          ...detailsData,
-          isFavorite: true,
-        },
-      ];
-      setFavorites(updatedFavorites);
-      localStorage.setItem('favoriteList', JSON.stringify(updatedFavorites));
-    }
-  }; 
   return (
     <>
       <section className='bg-slate-400 sm:h-[500px] p-10'>
@@ -94,7 +73,7 @@ const RecipeDetails = ({ detailsData }) => {
               </div>
               <button
                 className='w-52 h-10 mt-16 gap-2 border rounded-md flex items-center justify-center border-slate-900'
-                onClick={handleClick}
+                onClick={() => toggleFav(detailsData)}
               >
                 {isFavorite ? (
                   <IoHeartDislike size={28} />
