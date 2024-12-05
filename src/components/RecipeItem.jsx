@@ -5,17 +5,20 @@ import { Link } from 'react-router-dom';
 
 const RecipeItem = ({ recipe, isFavorite, toggleFav }) => {
   const [showTooltip, setShowTooltip] = useState(false);
+  console.log(recipe);
+  
   return (
     <>
-      <div className='rounded border relative'>
+      <div className='rounded border relative w-full'>
         <Link to={`/details/${recipe.id}`}>
-          <div>
+          <div className='object-cover w-full h-[75%]'>
             <img
+              className='w-full h-full'
               src={recipe.image}
-              alt=''
+              alt={`${recipe.title} image`}
             />
           </div>
-          <div className='h-14 flex flex-col p-1'>
+          <div className='h-14 flex flex-col pt-4'>
             <div className='text-base '>{recipe.title}</div>
             <div className=' font-bold text-lg'>{recipe.title}</div>
           </div>
