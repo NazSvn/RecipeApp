@@ -15,10 +15,10 @@ const RecipeList = () => {
 
   return (
     <>
-      <section>
+      <section className='max-w-[648px] mx-auto p-6 md:max-w-none lg:max-w-[1280px]'>
         <div>
           {recipeList ? (
-            <div className='grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5'>
+            <div className='grid gap-4 grid-cols-1  md:gap-6 md:grid-cols-3 lg:gap-12'>
               {recipeList?.results?.map((recipe, i) => {
                 const isFavorite = getFavoriteTag(recipe.id);
                 return (
