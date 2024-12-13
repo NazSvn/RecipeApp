@@ -19,43 +19,37 @@ const RecipeDetails = ({ detailsData }) => {
 
   return (
     <>
-      <section className='bg-slate-400 sm:h-[500px] p-10'>
+      <section className="bg-slate-400 p-10 sm:h-[500px]">
         {RecipeDetails && (
-          <div className='mx-auto gap-5 grid grid-cols-1 sm:[grid-template-columns:1fr_2fr]  sm:max-w-4xl'>
-            <div className='w-60 md:w-80 h-60 md:h-80  mx-auto'>
+          <div className="mx-auto grid grid-cols-1 gap-5 sm:max-w-4xl sm:[grid-template-columns:1fr_2fr]">
+            <div className="mx-auto h-60 w-60 md:h-80 md:w-80">
               <img
-                className='h-60 md:h-80 object-cover rounded-md'
+                className="h-60 rounded-md object-cover md:h-80"
                 src={detailsData?.image}
                 alt={`${detailsData?.title}'s image`}
               />
             </div>
             <div>
               <div>
-                <h1 className='text-3xl mb-5'>{detailsData?.title}</h1>
+                <h1 className="mb-5 text-3xl">{detailsData?.title}</h1>
               </div>
-              <div className='flex gap-4 content-center mb-4'>
+              <div className="mb-4 flex content-center gap-4">
                 <div>
                   <span>
-                    <IoPieChart
-                      size={28}
-                      className='inline mr'
-                    />
+                    <IoPieChart size={28} className="mr inline" />
                   </span>{' '}
                   servings: {detailsData?.servings}
                 </div>
                 <div>
                   <span>
-                    <IoTimeOutline
-                      size={28}
-                      className='inline mr'
-                    />
+                    <IoTimeOutline size={28} className="mr inline" />
                   </span>{' '}
                   Ready in: {detailsData?.readyInMinutes} min
                 </div>
               </div>
 
               <div
-                className='text-left mb-5'
+                className="mb-5 text-left"
                 dangerouslySetInnerHTML={{
                   __html: shortenedDescription,
                 }}
@@ -63,16 +57,13 @@ const RecipeDetails = ({ detailsData }) => {
 
               <div>
                 {detailsData?.diets?.map((tag, i) => (
-                  <div
-                    className='text-sm inline font-bold mr-4'
-                    key={i}
-                  >
+                  <div className="mr-4 inline text-sm font-bold" key={i}>
                     {tag}
                   </div>
                 ))}
               </div>
               <button
-                className='w-52 h-10 mt-16 gap-2 border rounded-md flex items-center justify-center border-slate-900'
+                className="mt-16 flex h-10 w-52 items-center justify-center gap-2 rounded-md border border-slate-900"
                 onClick={() => toggleFav(detailsData)}
               >
                 {isFavorite ? (
@@ -92,49 +83,43 @@ const RecipeDetails = ({ detailsData }) => {
 
       <section>
         {detailsData && (
-          <div className='container mx-auto px-4 py-8 max-w-4xl'>
-            <div className='shadow-lg rounded-lg overflow-hidden'>
-              <div className=''>
-                <h2 className='text-2xl font-semibold mb-4 border-b pb-2'>
+          <div className="container mx-auto max-w-4xl px-4 py-8">
+            <div className="overflow-hidden rounded-lg shadow-lg">
+              <div className="">
+                <h2 className="mb-4 border-b pb-2 text-2xl font-semibold">
                   Ingredients
                 </h2>
-                <ul className='space-y-2 text-sm sm:text-base '>
+                <ul className="space-y-2 text-sm sm:text-base">
                   {detailsData?.extendedIngredients?.map((item, index) => (
                     <li
                       key={index}
-                      className='flex items-center  pb-3 flex-wrap border-b ml-4'
+                      className="ml-4 flex flex-wrap items-center border-b pb-3"
                     >
-                      <span className='font-medium mr-2'>
+                      <span className="mr-2 font-medium">
                         <span>{item.amount}</span> <span>{item.unit}</span>
                       </span>
-                      <span className=''>{item.originalName}</span>
+                      <span className="">{item.originalName}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
               {/* Instructions Section */}
-              <div className='pt-6'>
-                <h2 className='text-2xl font-semibold mb-4 border-b pb-2'>
+              <div className="pt-6">
+                <h2 className="mb-4 border-b pb-2 text-2xl font-semibold">
                   Directions
                 </h2>
                 {detailsData?.analyzedInstructions?.map((instruction, i) => (
-                  <div
-                    key={i}
-                    className='mb-4'
-                  >
+                  <div key={i} className="mb-4">
                     {instruction.name && (
-                      <h3 className='text-xl font-medium mb-2'>
+                      <h3 className="mb-2 text-xl font-medium">
                         {instruction.name}
                       </h3>
                     )}
-                    <ul className='space-y-2  '>
+                    <ul className="space-y-2">
                       {instruction.steps.map((step) => (
-                        <li
-                          key={step.number}
-                          className='ml-4'
-                        >
-                          <span className='font-semibold mr-2'>
+                        <li key={step.number} className="ml-4">
+                          <span className="mr-2 font-semibold">
                             Step {step.number}
                           </span>
                           {step.step}
