@@ -15,7 +15,7 @@ const SearchEngine = () => {
   });
   const [url, setUrl] = useState(null);
 
-  const { setRecipeList} = useContext(GlobalContext);
+  const { setRecipeList } = useContext(GlobalContext);
 
   const inputRef = useRef();
 
@@ -34,7 +34,7 @@ const SearchEngine = () => {
         setQuery(inputValue);
         setInputValue('');
         inputRef.current.blur();
-        navigate('/');
+        navigate('/searchResults');
         break;
       case 'Escape':
         setInputValue('');
@@ -66,17 +66,17 @@ const SearchEngine = () => {
           setCachedData(cleanedCache);
           localStorage.setItem(
             'cachedRecipeList',
-            JSON.stringify(cleanedCache)
+            JSON.stringify(cleanedCache),
           );
         }
       } else {
         setUrl(
-          `https://api.spoonacular.com/recipes/complexSearch?apiKey=&query=${query}&number=20`
+          `https://api.spoonacular.com/recipes/complexSearch?apiKey=&query=${query}&number=20`,
         );
         console.log('call api');
       }
     },
-    [cachedData, cleanupCache, setRecipeList]
+    [cachedData, cleanupCache, setRecipeList],
   );
 
   useEffect(() => {
@@ -101,14 +101,14 @@ const SearchEngine = () => {
 
   if (loading)
     return (
-      <div className='flex justify-center items-center h-screen text-2xl text-gray-600'>
+      <div className="flex h-screen items-center justify-center text-2xl text-gray-600">
         Loading recipe details...
       </div>
     );
 
   if (error)
     return (
-      <div className='flex justify-center items-center h-screen text-2xl text-red-600'>
+      <div className="flex h-screen items-center justify-center text-2xl text-red-600">
         Error: {error}
       </div>
     );
@@ -116,15 +116,15 @@ const SearchEngine = () => {
   return (
     <>
       <input
-        type='text'
-        name='search'
+        type="text"
+        name="search"
         value={inputValue}
-        placeholder='Search Recipe'
+        placeholder="Search Recipe"
         ref={inputRef}
         onChange={handleOnChange}
         onKeyDown={(e) => handleKeys(e)}
-        aria-label='Search for recipes'
-        className='p-2 rounded-md w-96 shadow-sm'
+        aria-label="Search for recipes"
+        className="w-96 rounded-md p-2 shadow-sm"
       />
     </>
   );
