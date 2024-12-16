@@ -1,18 +1,21 @@
 import { useParams } from 'react-router-dom';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect } from 'react';
 import RecipeDetails from '../components/RecipeDetails';
 import useFetch from '../hooks/useFetch';
 import useCleanupCache from '../hooks/useCleanupCache';
+import { GlobalContext } from '../context/GlobalContext';
 
 const Details = () => {
   const params = useParams();
 
-  const [cachedDetails, setCachedDetails] = useState(() => {
-    const savedCache = localStorage.getItem('recipeCache');
-    return savedCache ? JSON.parse(savedCache) : {};
-  });
-  const [detailsData, setDetailsData] = useState(null);
-  const [url, setUrl] = useState(null);
+  const {
+    cachedDetails,
+    setCachedDetails,
+    detailsData,
+    setDetailsData,
+    url,
+    setUrl,
+  } = useContext(GlobalContext);
 
   const { fetchedData, loading, error } = useFetch(url);
 
@@ -29,10 +32,10 @@ const Details = () => {
       setUrl(null);
     } else {
       setUrl(
-        `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=`
+        `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=`,
       );
     }
-  }, [cachedDetails, cleanupCache, params.id]);
+  }, [cachedDetails, cleanupCache, params.id, setDetailsData, setUrl]);
 
   useEffect(() => {
     checkCache();
@@ -53,25 +56,25 @@ const Details = () => {
       localStorage.setItem('recipeCache', JSON.stringify(updatedCache));
       setDetailsData(fetchedData);
     }
-  }, [cachedDetails, fetchedData, params.id]);
+  }, [cachedDetails, fetchedData, params.id, setCachedDetails, setDetailsData]);
 
   if (loading)
     return (
-      <div className='flex justify-center items-center h-screen text-2xl text-gray-600'>
+      <div className="flex h-screen items-center justify-center text-2xl text-gray-600">
         Loading recipe details...
       </div>
     );
 
   if (error)
     return (
-      <div className='flex justify-center items-center h-screen text-2xl text-red-600'>
+      <div className="flex h-screen items-center justify-center text-2xl text-red-600">
         Error: {error}
       </div>
     );
 
   return (
     <>
-      <div className='pt-24'></div>
+      <div className="pt-24"></div>
       <RecipeDetails detailsData={detailsData} />
     </>
   );
