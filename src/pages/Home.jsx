@@ -1,10 +1,10 @@
-import RecipeList from '../components/RecipeList';
+import Hero from '../components/Hero';
 
 const Home = () => {
   return (
     <>
-      <div className='pt-24'></div>
-      <RecipeList />
+      <div className="pt-24"></div>
+      <Hero />
     </>
   );
 };
