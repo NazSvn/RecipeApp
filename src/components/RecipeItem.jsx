@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { IoHeart, IoHeartOutline } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 
-const RecipeItem = ({ recipe, isFavorite, toggleFav }) => {
-  const [showTooltip, setShowTooltip] = useState(false);
-  console.log(recipe);
+const RecipeItem = ({ recipe, isFavorite, toggleFavsFromHomePage }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <>
       <div className="height group relative w-full">
@@ -21,33 +21,24 @@ const RecipeItem = ({ recipe, isFavorite, toggleFav }) => {
               }}
             />
           </div>
-          <div className="flex h-14 flex-col pt-4">
-            <div className="text-sm font-medium">{recipe.title}</div>
-            <div className="relative text-xl font-bold leading-9 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-[#fa770d] after:transition-all after:duration-700 group-hover:after:w-full">
-              {recipe.title}
-            </div>
+
+          <div className="relative mt-3 text-xl font-bold after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-[#fa770d] after:transition-all after:duration-700 group-hover:after:w-full">
+            {recipe.title}
           </div>
         </Link>
 
         <button
-          onMouseEnter={() => setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           className="absolute right-2 top-2 items-center justify-center border-slate-900"
-          onClick={() => toggleFav(recipe)}
+          onClick={() => toggleFavsFromHomePage(recipe)}
         >
-          {isFavorite ? (
+          {isFavorite || isHovered ? (
             <IoHeart size={35} className="text-[#fa770d]" />
           ) : (
             <IoHeartOutline size={35} className="text-[#fa770d]" />
           )}{' '}
         </button>
-        <span
-          className={`absolute -right-6 top-10 z-10 w-24 content-center rounded-md border bg-slate-700 py-1 text-center text-[0.5rem] font-medium ${
-            showTooltip ? 'visible transition-all delay-1000' : 'hidden'
-          }`}
-        >
-          {isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-        </span>
       </div>
     </>
   );
@@ -57,5 +48,5 @@ export default RecipeItem;
 RecipeItem.propTypes = {
   recipe: PropTypes.object.isRequired,
   isFavorite: PropTypes.bool.isRequired,
-  toggleFav: PropTypes.func.isRequired,
+  toggleFavsFromHomePage: PropTypes.func.isRequired,
 };
