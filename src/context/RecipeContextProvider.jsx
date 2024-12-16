@@ -8,11 +8,23 @@ const RecipeContextProvider = ({ children }) => {
     const savedFavorites = localStorage.getItem('favoriteList');
     return savedFavorites ? JSON.parse(savedFavorites) : [];
   });
+  const [cachedDetails, setCachedDetails] = useState(() => {
+    const savedCache = localStorage.getItem('recipeCache');
+    return savedCache ? JSON.parse(savedCache) : {};
+  });
+
+  const [randomCache, setRandomCache] = useState(() => {
+    const savedCache = localStorage.getItem('randomCacheData');
+    return savedCache ? JSON.parse(savedCache) : {};
+  });
+
+  const [detailsData, setDetailsData] = useState(null);
+  const [url, setUrl] = useState(null);
 
   const toggleFav = useCallback((recipe) => {
     setFavorites((currentFavorites) => {
       const isFavoriteRecipe = currentFavorites.some(
-        (fav) => fav.id === recipe.id
+        (fav) => fav.id === recipe.id,
       );
       const updatedFavorites = isFavoriteRecipe
         ? currentFavorites.filter((fav) => fav.id !== recipe.id)
@@ -29,6 +41,14 @@ const RecipeContextProvider = ({ children }) => {
     favorites,
     setFavorites,
     toggleFav,
+    cachedDetails,
+    setCachedDetails,
+    detailsData,
+    setDetailsData,
+    url,
+    setUrl,
+    randomCache,
+    setRandomCache,
   };
 
   return (
