@@ -1,121 +1,64 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
-import useFetch from '../hooks/useFetch';
-import { GlobalContext } from '../context/GlobalContext';
-
-const RANDOM_DATA_AGE_LIMIT = 30 * 60 * 1000;
-
-const Hero = () => {
-  const { randomCache, setRandomCache } = useContext(GlobalContext);
-  const [heroData, setHeroData] = useState(null);
-  const [url, setUrl] = useState(null);
-
-  const { fetchedData, loading, error } = useFetch(url);
-
-  const checkCache = useCallback(() => {
-    const storedCache = localStorage.getItem('randomCacheData');
-    let parsedCache;
-    try {
-      parsedCache = storedCache ? JSON.parse(storedCache) : null;
-    } catch (parseError) {
-      parsedCache = null;
-      console.error('Error parsing stored cache', parseError);
-    }
-
-    if (
-      randomCache &&
-      randomCache.timestamp &&
-      parsedCache.timestamp &&
-      randomCache.data &&
-      Date.now() - randomCache.timestamp < RANDOM_DATA_AGE_LIMIT
-    ) {
-      setHeroData(randomCache.data);
-      setUrl(null);
-      console.log('using random cache');
-    } else {
-      setUrl(
-        `https://api.spoonacular.com/recipes/random?`,
-      );
-      console.log('making API call');
-    }
-  }, [randomCache]);
-
-  useEffect(() => {
-    checkCache();
-  }, [checkCache]);
-
-  useEffect(() => {
-    if (fetchedData) {
-      const updateRandomCache = {
-        data: fetchedData,
-        timestamp: Date.now(),
-      };
-
-      try {
-        setRandomCache(updateRandomCache);
-        localStorage.setItem(
-          'randomCacheData',
-          JSON.stringify(updateRandomCache),
-        );
-        setHeroData(fetchedData);
-      } catch (storageError) {
-        console.error('Error updating cache', storageError);
-      }
-    }
-  }, [fetchedData, setRandomCache]);
-
-  console.log(heroData);
+import PropTypes from 'prop-types';
+import GetRecipeImage from '../utility/GetRecipeImages';
+import { Link } from 'react-router-dom';
+import DietTypesList from './DietTypeList';
+import DishTypesList from './DishTypeList';
+const Hero = ({ heroData, loading, error }) => {
+  const description = heroData?.summary;
+  const descPart = description?.split('.');
+  const shortenedDescription = descPart?.slice(0, 2).join('.') + '.';
 
   if (loading)
     return (
-      <div className="flex h-screen items-center justify-center text-2xl text-gray-600">
-        Loading recipe details...
+      <div className="flex flex-col items-center justify-center text-2xl text-white">
+        <div className="bg-background rounded-lg border border-purple-light p-6">
+          Loading recipe details...
+        </div>
       </div>
     );
 
   if (error)
     return (
-      <div className="flex h-screen items-center justify-center text-2xl text-red-600">
-        Error: {error}
+      <div className="flex flex-col items-center justify-center text-2xl">
+        <div className="rounded-lg bg-accent-red p-6 text-white">
+          Error: {error}
+        </div>
       </div>
     );
 
   return (
     <>
-      <section className="mx-auto max-w-[648px] p-6 md:max-w-none lg:max-w-[1280px]">
-        <div className="relative mx-auto w-3/5">
-          <img
-            className="h-full w-full"
-            src={heroData?.recipes[0]?.image}
-            alt={`${heroData?.recipes[0]?.title} image`}
-            onError={(e) => {
-              e.target.onerror = null; // Prevent infinite loop
-              e.target.src = `https://placehold.co/800x600?text=${heroData?.recipes[0]?.title}`;
-            }}
-          />
-          <div className="absolute bottom-5 left-6 max-w-[70%] bg-white/30 p-3 text-black backdrop-blur-md">
-            <div className="mb-1">
-              {heroData?.recipes[0]?.dishTypes.map((dishType, i) => (
-                <span key={i}>
-                  {dishType.charAt(0).toUpperCase().concat(dishType.slice(1))}
-                </span>
-              ))}
-            </div>
+      <section className="mx-auto p-6 md:max-w-none lg:max-w-[1280px]">
+        <Link to={`/details/${heroData?.id}`}>
+          <div className="relative mx-auto overflow-hidden rounded-md transition-shadow hover:shadow-lg lg:w-[940px]">
+            {heroData && (
+              <GetRecipeImage recipe={heroData} classes="h-full w-full" />
+            )}
+            <div className="absolute bottom-1 left-1 overflow-hidden rounded-md bg-purple/60 px-2 py-1 backdrop-blur-md transition-colors hover:bg-purple-dark/80 xs:max-w-[90%] sm:max-w-[70%] sm:p-3 md:bottom-5 md:left-6">
+              <div className="mb-1">
+                {heroData && <DishTypesList dishTypes={heroData?.dishTypes} />}
+              </div>
 
-            <h1 className="text-3xl font-medium">
-              {heroData?.recipes[0]?.title}
-            </h1>
-            <div className="mt-1">
-              {heroData?.recipes[0]?.diets.map((diet, i) => (
-                <span className="mr-2" key={i}>
-                  {diet.charAt(0).toUpperCase().concat(diet.slice(1))}
-                </span>
-              ))}
+              <h1 className="font-medium xs:text-3xl">{heroData?.title}</h1>
+              <div className="mt-3 hidden xs:block">
+                {DietTypesList(heroData?.diets)}
+              </div>
+              <div
+                className="mt-2 hidden sm:block"
+                dangerouslySetInnerHTML={{ __html: shortenedDescription }}
+              />
             </div>
           </div>
-        </div>
+        </Link>
       </section>
     </>
   );
 };
 
 export default Hero;
+
+Hero.propTypes = {
+  heroData: PropTypes.object,
+  loading: PropTypes.node,
+  error: PropTypes.node,
+};
