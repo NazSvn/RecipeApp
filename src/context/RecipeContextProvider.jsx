@@ -1,9 +1,10 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { GlobalContext } from './GlobalContext';
 import PropTypes from 'prop-types';
 
 const RecipeContextProvider = ({ children }) => {
-  const [recipeList, setRecipeList] = useState(null);
+  const [recipeList, setRecipeList] = useState(null); 
+
   const [favorites, setFavorites] = useState(() => {
     const savedFavorites = localStorage.getItem('favoriteList');
     return savedFavorites ? JSON.parse(savedFavorites) : [];
@@ -18,8 +19,19 @@ const RecipeContextProvider = ({ children }) => {
     return savedCache ? JSON.parse(savedCache) : {};
   });
 
+  const [similarCache, setSimilarCache] = useState(() => {
+    const savedCache = localStorage.getItem('similarCacheData');
+    return savedCache ? JSON.parse(savedCache) : {};
+  });
+
   const [detailsData, setDetailsData] = useState(null);
-  const [url, setUrl] = useState(null);
+
+  const [showingSearch, setShowingSearch] = useState(false);
+
+  const [inputValue, setInputValue] = useState('');
+
+  const inputRef = useRef();
+  const toggleSearchRef = useRef();
 
   const toggleFav = useCallback((recipe) => {
     setFavorites((currentFavorites) => {
@@ -45,10 +57,16 @@ const RecipeContextProvider = ({ children }) => {
     setCachedDetails,
     detailsData,
     setDetailsData,
-    url,
-    setUrl,
     randomCache,
     setRandomCache,
+    similarCache,
+    setSimilarCache,
+    showingSearch,
+    setShowingSearch,
+    inputRef,
+    toggleSearchRef,
+    inputValue,
+    setInputValue,
   };
 
   return (
