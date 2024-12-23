@@ -43,9 +43,7 @@ const RecipeList = () => {
         });
         setUrl(null);
       } else {
-        setUrl(
-          `https://api.spoonacular.com/recipes/${recipeId}/information?`,
-        );
+        setUrl(`/.netlify/functions/searchDetails?recipeId=${recipeId}`);
       }
     },
     [cachedDetails, cleanupCache, setFavorites],
