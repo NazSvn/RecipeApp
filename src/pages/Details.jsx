@@ -4,6 +4,8 @@ import RecipeDetails from '../components/RecipeDetails';
 import useFetch from '../hooks/useFetch';
 import useCleanupCache from '../hooks/useCleanupCache';
 import { GlobalContext } from '../context/GlobalContext';
+import RecipeIngredients from '../components/RecipeIngredients';
+import RecipeDirections from '../components/RecipeDirections';
 
 const Details = () => {
   const params = useParams();
@@ -75,7 +77,13 @@ const Details = () => {
   return (
     <>
       <div className="pt-24"></div>
-      <RecipeDetails detailsData={detailsData} />
+      {detailsData && <RecipeDetails detailsData={detailsData} />}
+      {detailsData && (
+        <RecipeIngredients ingredients={detailsData?.extendedIngredients} />
+      )}
+      {detailsData && (
+        <RecipeDirections directions={detailsData?.analyzedInstructions} />
+      )}
     </>
   );
 };
