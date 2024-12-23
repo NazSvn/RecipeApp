@@ -3,8 +3,7 @@ import SearchEngine from './SearchEngine';
 import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { RxCross2, RxHamburgerMenu } from 'react-icons/rx';
 import { GlobalContext } from '../context/GlobalContext';
-
-const MIN_WINDOW_WIDTH = 768;
+import { MIN_NAV_WINDOW_WIDTH } from '../services/minNavWidth';
 
 const NavBar = () => {
   const { setShowingSearch, inputRef, toggleSearchRef, setInputValue } =
@@ -56,7 +55,7 @@ const NavBar = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= MIN_WINDOW_WIDTH) {
+      if (window.innerWidth >= MIN_NAV_WINDOW_WIDTH) {
         document.body.classList.remove('no-scroll');
         setIsOpen(false);
       }
