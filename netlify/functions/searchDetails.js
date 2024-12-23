@@ -1,8 +1,5 @@
 export const handler = async (event) => {
   try {
-    // Log to help debug
-    console.log('Request parameters:', event.queryStringParameters);
-
     const { recipeId } = event.queryStringParameters;
 
     if (!recipeId) {
@@ -14,15 +11,9 @@ export const handler = async (event) => {
 
     // eslint-disable-next-line no-undef
     const url = `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=${process.env.SPOONACULAR_API_KEY}`;
-    console.log(
-      'Fetching from URL:',
-      // eslint-disable-next-line no-undef
-      url.replace(process.env.SPOONACULAR_API_KEY, 'HIDDEN'),
-    );
 
     const response = await fetch(url);
 
-    // Check if the response is ok
     if (!response.ok) {
       const errorData = await response.text();
       console.error('API response not ok:', response.status, errorData);
