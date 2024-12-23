@@ -107,8 +107,10 @@ const RecipeList = () => {
               })}
             </div>
           ) : (
-            <div className="flex h-screen items-center justify-center text-2xl text-gray-600">
-              Search for a recipe
+            <div className="flex h-[600px] items-center justify-center">
+              <div className="rounded-lg border border-purple-light p-6 text-2xl text-white transition-colors hover:border-purple-lightest">
+                Search for a recipe
+              </div>
             </div>
           )}
         </div>
