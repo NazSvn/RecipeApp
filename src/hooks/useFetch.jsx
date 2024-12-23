@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 const useFetch = (url) => {
   const [fetchedData, setFetchedData] = useState(null);
@@ -26,7 +25,7 @@ const useFetch = (url) => {
 
       if (!response.ok) {
         throw new Error(
-          `HTTP error! Status: ${response.status} (${response.statusText})`
+          `HTTP error! Status: ${response.status} (${response.statusText})`,
         );
       }
       const result = await response.json();
