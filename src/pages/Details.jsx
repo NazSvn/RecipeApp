@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useCallback, useContext, useEffect } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import RecipeDetails from '../components/RecipeDetails';
 import useFetch from '../hooks/useFetch';
 import useCleanupCache from '../hooks/useCleanupCache';
@@ -15,10 +15,10 @@ const Details = () => {
     setCachedDetails,
     detailsData,
     setDetailsData,
-    url,
-    setUrl,
+     
   } = useContext(GlobalContext);
-
+const [url,
+    setUrl] =useState(null)
   const { fetchedData, loading, error } = useFetch(url);
 
   const cleanupCache = useCleanupCache();
@@ -33,9 +33,7 @@ const Details = () => {
       setDetailsData(cachedRecipe.data);
       setUrl(null);
     } else {
-      setUrl(
-        `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=`,
-      );
+      setUrl(`/.netlify/functions/searchDetails?recipeId=${recipeId}`);
     }
   }, [cachedDetails, cleanupCache, params.id, setDetailsData, setUrl]);
 
